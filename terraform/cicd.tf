@@ -176,12 +176,27 @@ resource "aws_iam_role_policy" "codepipeline" {
 }
 
 resource "aws_codepipeline" "netflux" {
-  name     = "${var.project_name}-pipeline"
-  role_arn = aws_iam_role.codepipeline.arn
+  name          = "${var.project_name}-pipeline"
+  role_arn      = aws_iam_role.codepipeline.arn
+  pipeline_type = "V2" # needed for the native git trigger block below (V1 has no auto-trigger via Terraform)
 
   artifact_store {
     type     = "S3"
     location = aws_s3_bucket.pipeline_artifacts.bucket
+  }
+
+  trigger {
+    provider_type = "CodeStarSourceConnection"
+
+    git_configuration {
+      source_action_name = "Source"
+
+      push {
+        branches {
+          includes = ["main"]
+        }
+      }
+    }
   }
 
   stage {
