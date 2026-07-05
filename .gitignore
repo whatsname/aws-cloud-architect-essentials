@@ -50,3 +50,11 @@
 !**/*front-end.zip
 !**/bucket-policy-resources.zip
 netflux/postgres/db
+
+### Terraform
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/terraform.tfvars
+**/*.auto.tfvars
+**/crash.log
