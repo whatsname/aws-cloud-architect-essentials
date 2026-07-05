@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+  build:
+    commands:
+      - cd netflux/movie-service && mvn -q -DskipTests package && cd ../..
+      - cd netflux/customer-service && mvn -q -DskipTests package && cd ../..
+      - docker build -t $MOVIE_REPO_URL:latest ./netflux/movie-service
+      - docker build -t $CUSTOMER_REPO_URL:latest ./netflux/customer-service
+      - docker push $MOVIE_REPO_URL:latest
+      - docker push $CUSTOMER_REPO_URL:latest
+  post_build:
+    commands:
+      - aws ecs update-service --cluster $ECS_CLUSTER --service movie-service --force-new-deployment
+      - aws ecs update-service --cluster $ECS_CLUSTER --service customer-service --force-new-deployment

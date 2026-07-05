@@ -33,3 +33,8 @@ output "alb_dns_name" {
 output "ecs_cluster_name" {
   value = aws_ecs_cluster.main.name
 }
+
+output "codestar_connection_arn" {
+  description = "PENDING until you authorize it once in AWS console: CodePipeline -> Settings -> Connections"
+  value       = aws_codestarconnections_connection.github.arn
+}
